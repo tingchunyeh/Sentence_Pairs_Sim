@@ -1,0 +1,12 @@
+data filter=lfs diff=lfs merge=lfs -text
+data/ind2word.pickle filter=lfs diff=lfs merge=lfs -text
+data/kb_question.csv filter=lfs diff=lfs merge=lfs -text
+data/raw_kb.xlsx filter=lfs diff=lfs merge=lfs -text
+data/test_set_tokenized.csv filter=lfs diff=lfs merge=lfs -text
+data/word2ind.pickle filter=lfs diff=lfs merge=lfs -text
+data/dev.csv filter=lfs diff=lfs merge=lfs -text
+data/kb_parsed.csv filter=lfs diff=lfs merge=lfs -text
+data/kb_parsed_tokenized.csv filter=lfs diff=lfs merge=lfs -text
+data/questions_test_tokenized.csv filter=lfs diff=lfs merge=lfs -text
+data/test.csv filter=lfs diff=lfs merge=lfs -text
+data/train.csv filter=lfs diff=lfs merge=lfs -text
