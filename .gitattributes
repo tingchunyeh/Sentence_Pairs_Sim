@@ -10,3 +10,5 @@ data/kb_parsed_tokenized.csv filter=lfs diff=lfs merge=lfs -text
 data/questions_test_tokenized.csv filter=lfs diff=lfs merge=lfs -text
 data/test.csv filter=lfs diff=lfs merge=lfs -text
 data/train.csv filter=lfs diff=lfs merge=lfs -text
+w2v-model.txt filter=lfs diff=lfs merge=lfs -text
+wiki.zh.vec filter=lfs diff=lfs merge=lfs -text

@@ -181,7 +181,7 @@ def evaluate(epoch, eval_type='dev', final_eval=False):
 #         s1_batch, s1_len = get_batch(s1[i:i + params.batch_size], wv, default_wv, params.dpout_embed)
 #         s2_batch, s2_len = get_batch(s2[i:i + params.batch_size], wv, default_wv, params.dpout_embed)
         s1_batch, s1_len= get_inds_batch(s1[i: i+params.batch_size], word2ind)
-        s2_batch, s2_len= get_inds_batch(si[i: i+params.batch_size], word2ind)
+        s2_batch, s2_len= get_inds_batch(s2[i: i+params.batch_size], word2ind)
         
         if params.use_cuda:
             s1_batch, s2_batch = Variable(s1_batch.cuda()), Variable(s2_batch.cuda())
