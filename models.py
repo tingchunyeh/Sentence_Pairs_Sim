@@ -49,6 +49,7 @@ class GRUEncoder(nn.Module):
         sent_packed = nn.utils.rnn.pack_padded_sequence(sent, sent_len)
         sent_output, hidden = self.enc_lstm(sent_packed, self.init_lstm)
         emb = torch.cat((hidden[0], hidden[1]), 1) # batch x 2*nhid
+        return sent_output, hidden
         
         idx_unsort = np.argsort(idx_sort)
         if self.use_cuda:

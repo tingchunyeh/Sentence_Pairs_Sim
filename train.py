@@ -3,6 +3,8 @@ from models import *
 import argparse
 import os
 import pickle
+import logging
+
 
 parser = argparse.ArgumentParser(description='NLI training')
 
@@ -20,16 +22,18 @@ parser.add_argument("--use_cuda", type=bool, default=True, help="True or False")
 
 
 # train
-parser.add_argument("--n_epochs", type=int, default=20)
+parser.add_argument("--n_epochs", type=int, default=10)
 parser.add_argument("--batch_size", type=int, default=64)
 parser.add_argument("--dpout_model", type=float, default=0., help="encoder dropout")
 parser.add_argument("--dpout_fc", type=float, default=0.2, help="classifier dropout")
 parser.add_argument("--dpout_embed", type=float, default=0., help="embed dropout")
-parser.add_argument("--embed_freeze", type=bool, default=True, help="embed freeze")
+parser.add_argument("--embed_freeze", type=int, default=1, help="embed freeze 0:not freeze, 1:freeze")
 parser.add_argument("--lr", type=float, default=0.001, help="learning rate for adam")
 parser.add_argument("--last_model", type=str, default="", help="train on last saved model")
 parser.add_argument("--saved_model_name", type=str, default="model_new", help="saved model name")
 parser.add_argument("--w2v_model", type=str, default="w2v-model.txt", help="w2v file name")
+parser.add_argument("--weight_decay", type=float, default=0., help="L2 penalty")
+parser.add_argument("--lr_decay_th", type=float, default=0., help="threshold on loss improve for learning rate decay")
 
 
 params, _ = parser.parse_known_args()
@@ -60,8 +64,6 @@ else:
     ind2word = pickle.load( open( os.path.join(params.data_path, "ind2word.pickle" ), "rb") )
     
 word_embed_matrix = build_word_embed_matrix(word2ind, pretrained_wordVec="w2v-model.txt")
-# wv, default_wv = build_vocab(np.append(train['s1'], train['s2']), params.w2v_model)
-
 
 
 '''
@@ -81,8 +83,9 @@ config_nli_model = {
     'encoder_type'   :  params.encoder_type,
     'use_cuda'       :  params.use_cuda,
     'dpout_embed'    :  params.dpout_embed,
-    'embed_freeze'   :  params.embed_freeze,
+    'embed_freeze'   :  params.embed_freeze==1,
     'embed_matrix'   :  word_embed_matrix,
+    'weight_decay'   :  params.weight_decay,
 }
     
 
@@ -95,12 +98,11 @@ print(nli_net)
 # loss 
 weight = torch.FloatTensor(3).fill_(1)
 loss_fn = nn.CrossEntropyLoss(weight=weight)
-loss_fn.size_average = False
 
 # optimizer
 from torch import optim
 parameters = filter(lambda p: p.requires_grad, nli_net.parameters())
-optimizer = optim.Adam(parameters, lr=params.lr)
+optimizer = optim.Adam(parameters, lr=params.lr, weight_decay=params.weight_decay)
 
 # cuda 
 if params.use_cuda:
@@ -111,8 +113,13 @@ if params.use_cuda:
 
 
 '''
-TRAIN
+TRAIN FUNCTION
 '''
+def adjust_learning_rate(optimizer):
+    print("learning rate decay by half ... ")
+    for param_group in optimizer.param_groups:
+        param_group['lr'] /= 2
+
 def trainepoch(epoch):
     all_costs = []
     tot_costs = []
@@ -126,8 +133,6 @@ def trainepoch(epoch):
     target = train['label'][permutation]
     
     for i in range(0, len(s1), params.batch_size):
-#         s1_batch, s1_len = get_batch(s1[i:i+params.batch_size], wv, default_wv, params.dpout_embed)
-#         s2_batch, s2_len = get_batch(s2[i:i+params.batch_size], wv, default_wv, params.dpout_embed)
         s1_batch, s1_len= get_inds_batch(s1[i: i+params.batch_size], word2ind)
         s2_batch, s2_len= get_inds_batch(s2[i: i+params.batch_size], word2ind)
         
@@ -155,31 +160,25 @@ def trainepoch(epoch):
 
         if len(all_costs) == 100:
             logs.append('{0};  loss: {1};  accuracy train: {2}'.format(i, 
-                            round(np.mean(all_costs), 2), round(100.*correct/(i+k), 2)))
+                            round(np.mean(all_costs), 3), round(100.*correct/(i+k), 3)))
             print(logs[-1])
             all_costs = []
             
-    train_acc = round(100 * correct/len(s1), 2)
-    train_loss = round(np.mean(tot_costs), 2)
+    train_acc = round(100 * correct/len(s1), 3)
+    train_loss = round(np.mean(tot_costs), 3)
     return train_loss, train_acc    
 
 val_acc_best = -1e10
-adam_stop = False
-stop_training = False
-
-def evaluate(epoch, eval_type='dev', final_eval=False):
+def evaluate(epoch, eval_type='dev',):
     nli_net.eval()
     correct = 0.0
-    global val_acc_best, lr, stop_training, adam_stop
-    
+    global val_acc_best
     s1 = dev['s1'] if eval_type == 'dev' else test['s1']
     s2 = dev['s2'] if eval_type == 'dev' else test['s2']
     target = dev['label'] if eval_type == 'dev' else test['label']
 
     for i in range(0, len(s1), params.batch_size):
         # prepare batch
-#         s1_batch, s1_len = get_batch(s1[i:i + params.batch_size], wv, default_wv, params.dpout_embed)
-#         s2_batch, s2_len = get_batch(s2[i:i + params.batch_size], wv, default_wv, params.dpout_embed)
         s1_batch, s1_len= get_inds_batch(s1[i: i+params.batch_size], word2ind)
         s2_batch, s2_len= get_inds_batch(s2[i: i+params.batch_size], word2ind)
         
@@ -197,18 +196,11 @@ def evaluate(epoch, eval_type='dev', final_eval=False):
         correct += pred.long().eq(tgt_batch.data.long()).cpu().sum().item()
 
     # save model
-    eval_acc = round(100 * correct / len(s1), 2)
-    if final_eval:
-        print('finalgrep:  accuracy {0}: {1}'.format(eval_type, eval_acc))
-    else:
-        print('togrep:  results: epoch {0};  mean accuracy {1}:{2}'.format(epoch, eval_type, eval_acc))
+    eval_acc = round(100 * correct / len(s1), 3)
+    print('togrep:  results: epoch {0};  mean accuracy {1}:{2}'.format(epoch, eval_type, eval_acc))
 
     if eval_type == 'dev' and eval_acc > val_acc_best:
-        print('saving model at epoch {0}'.format(epoch))
-        saved_folder = os.path.join("saved_model", params.saved_model_name)        
-        if not os.path.exists(saved_folder): os.makedirs(saved_folder)
-        with open( os.path.join(saved_folder, "config.pickle" ), 'wb') as handle:
-            pickle.dump(params, handle, protocol=pickle.HIGHEST_PROTOCOL)        
+        print('saving model at epoch {0}'.format(epoch))      
         torch.save(nli_net.state_dict(), os.path.join(saved_folder, params.saved_model_name))
         val_acc_best = eval_acc
 
@@ -218,24 +210,52 @@ def evaluate(epoch, eval_type='dev', final_eval=False):
 """
 Train model 
 """
+saved_folder = os.path.join("saved_model", params.saved_model_name)        
+if not os.path.exists(saved_folder): os.makedirs(saved_folder)
+    
+with open( os.path.join(saved_folder, "config.pickle" ), 'wb') as handle:
+    pickle.dump(params, handle, protocol=pickle.HIGHEST_PROTOCOL)  
+    
+logger = logging.getLogger(params.saved_model_name)
+hdlr = logging.FileHandler( os.path.join(saved_folder, "train_process.log") )
+formatter = logging.Formatter('%(asctime)s, %(levelname)s, %(message)s')
+hdlr.setFormatter(formatter)
+logger.addHandler(hdlr) 
+logger.setLevel(logging.INFO)
+
 ### TRAINING 
 
 train_loss_ls = []
 train_acc_ls = []
 eval_acc_ls = []
 eval_acc = 0
+prev_loss = float('inf')
+
 for i in range(params.n_epochs):
     print('\nTRAINING : Epoch ' + str(i))
     train_loss, train_acc = trainepoch(i)
+    
+    if prev_loss-train_loss<params.lr_decay_th:
+        adjust_learning_rate(optimizer)
+
     train_loss_ls.append(train_loss)
     train_acc_ls.append(train_acc)
-    print('results: epoch {0};  loss: {1} mean accuracy train: {2}'.format(i, train_loss, train_acc))
+    
+    for pi in range(len(train_loss_ls)):
+        train_result = 'results: epoch {0};  loss: {1};  mean accuracy train: {2}'.format(pi, train_loss_ls[pi], train_acc_ls[pi])
+        print(train_result)
+    logger.info(train_result)
+    
     if i%1==0:
         print("-"*100)
         print('\nEVALIDATING: Epoch ' + str(i))
-        eval_acc = evaluate(i, eval_type='dev', final_eval=False)
+        eval_acc = evaluate(i, eval_type='dev')
         eval_acc_ls.append(eval_acc)
-        print('results: epoch {0};  mean accuracy dev: {1}'.format(i, eval_acc))
+        
+        for pi in range(len(train_loss_ls)):
+            dev_result = 'results: epoch {0};  mean accuracy dev: {1}'.format(pi, eval_acc_ls[pi])
+            print(dev_result)
+        logger.info(dev_result)
         print("-"*100)
 
 
