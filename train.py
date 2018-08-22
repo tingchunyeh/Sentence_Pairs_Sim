@@ -6,11 +6,11 @@ import pickle
 import logging
 import json
 
-
+'''
+PARAMETERS
+'''
 parser = argparse.ArgumentParser(description='NLI training')
-
 parser.add_argument("--data_path", type=str, default='data', help="path to data")
-
 
 # model
 parser.add_argument("--encoder_type", type=str, default='GRUEncoder', help="see list of encoders")
@@ -19,9 +19,8 @@ parser.add_argument("--num_layer", type=int, default=1, help="encoder num layers
 parser.add_argument("--fc_dim", type=int, default=256, help="nhid of fc layers")
 parser.add_argument("--n_classes", type=int, default=3, help="entailment/neutral/contradiction")
 parser.add_argument("--pool_type", type=str, default='max', help="max or mean")
-parser.add_argument("--use_cuda", type=bool, default=True, help="True or False")
-parser.add_argument("--final_hidden_attention", type=int, default=0, help="use attentsion for final hidden state. 0: False, 1:True")
-
+parser.add_argument("--use_cuda", action='store_true', help="True or False")
+parser.add_argument("--final_hidden_attention", action='store_true', help="use attentsion for final hidden state.")
 
 # train
 parser.add_argument("--n_epochs", type=int, default=10)
@@ -29,7 +28,7 @@ parser.add_argument("--batch_size", type=int, default=64)
 parser.add_argument("--dpout_model", type=float, default=0., help="encoder dropout")
 parser.add_argument("--dpout_fc", type=float, default=0.2, help="classifier dropout")
 parser.add_argument("--dpout_embed", type=float, default=0., help="embed dropout")
-parser.add_argument("--embed_freeze", type=int, default=1, help="freeze embedding layer 0:False, 1:True")
+parser.add_argument("--embed_freeze", action='store_true', help="freeze embedding layer 0:False, 1:True")
 parser.add_argument("--lr", type=float, default=0.001, help="learning rate for adam")
 parser.add_argument("--last_model", type=str, default="", help="train on last saved model")
 parser.add_argument("--saved_model_name", type=str, default="model_new", help="saved model name")
@@ -37,9 +36,9 @@ parser.add_argument("--w2v_model", type=str, default="w2v-model.txt", help="w2v 
 parser.add_argument("--weight_decay", type=float, default=0., help="L2 penalty")
 parser.add_argument("--lr_decay_th", type=float, default=0., help="threshold on loss improve for learning rate decay")
 
-
 params, _ = parser.parse_known_args()
 print(params)
+
 
 '''
 SEED
@@ -239,18 +238,21 @@ prev_loss = float('inf')
 for i in range(params.n_epochs):
     print('\nTRAINING : Epoch ' + str(i))
     train_loss, train_acc = trainepoch(i)
-    
-    if prev_loss-train_loss<params.lr_decay_th:
-        adjust_learning_rate(optimizer)
-
     train_loss_ls.append(train_loss)
     train_acc_ls.append(train_acc)
     
+    print("-"*100)
+    print('\nTRAINING : Epoch ' + str(i))
     for pi in range(len(train_loss_ls)):
         train_result = 'results: epoch {0};  loss: {1};  mean accuracy train: {2}'.format(pi, train_loss_ls[pi], train_acc_ls[pi])
         print(train_result)
     logger.info(train_result)
-    
+    print("-"*100)
+
+    if prev_loss-train_loss<params.lr_decay_th:
+        adjust_learning_rate(optimizer)
+    prev_loss = train_loss    
+        
     if i%1==0:
         print("-"*100)
         print('\nEVALIDATING: Epoch ' + str(i))

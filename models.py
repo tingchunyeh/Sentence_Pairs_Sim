@@ -6,6 +6,8 @@ from torch.autograd import Variable
 import torch.nn as nn
 from torch.nn.utils.rnn import pad_packed_sequence, pack_padded_sequence
 
+
+
 class GRUEncoder(nn.Module):
     def __init__(self, config):
         super(GRUEncoder, self).__init__()
