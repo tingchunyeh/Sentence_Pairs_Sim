@@ -4,6 +4,7 @@ import argparse
 import os
 import pickle
 import logging
+import json
 
 
 parser = argparse.ArgumentParser(description='NLI training')
@@ -19,6 +20,7 @@ parser.add_argument("--fc_dim", type=int, default=256, help="nhid of fc layers")
 parser.add_argument("--n_classes", type=int, default=3, help="entailment/neutral/contradiction")
 parser.add_argument("--pool_type", type=str, default='max', help="max or mean")
 parser.add_argument("--use_cuda", type=bool, default=True, help="True or False")
+parser.add_argument("--final_hidden_attention", type=int, default=0, help="use attentsion for final hidden state. 0: False, 1:True")
 
 
 # train
@@ -27,7 +29,7 @@ parser.add_argument("--batch_size", type=int, default=64)
 parser.add_argument("--dpout_model", type=float, default=0., help="encoder dropout")
 parser.add_argument("--dpout_fc", type=float, default=0.2, help="classifier dropout")
 parser.add_argument("--dpout_embed", type=float, default=0., help="embed dropout")
-parser.add_argument("--embed_freeze", type=int, default=1, help="embed freeze 0:not freeze, 1:freeze")
+parser.add_argument("--embed_freeze", type=int, default=1, help="freeze embedding layer 0:False, 1:True")
 parser.add_argument("--lr", type=float, default=0.001, help="learning rate for adam")
 parser.add_argument("--last_model", type=str, default="", help="train on last saved model")
 parser.add_argument("--saved_model_name", type=str, default="model_new", help="saved model name")
@@ -86,6 +88,7 @@ config_nli_model = {
     'embed_freeze'   :  params.embed_freeze==1,
     'embed_matrix'   :  word_embed_matrix,
     'weight_decay'   :  params.weight_decay,
+    "final_hidden_attention": params.final_hidden_attention==1,
 }
     
 
@@ -215,6 +218,8 @@ if not os.path.exists(saved_folder): os.makedirs(saved_folder)
     
 with open( os.path.join(saved_folder, "config.pickle" ), 'wb') as handle:
     pickle.dump(params, handle, protocol=pickle.HIGHEST_PROTOCOL)  
+with open( os.path.join(saved_folder,'config.json'), 'w') as fp:
+    json.dump( vars(params), fp)
     
 logger = logging.getLogger(params.saved_model_name)
 hdlr = logging.FileHandler( os.path.join(saved_folder, "train_process.log") )
