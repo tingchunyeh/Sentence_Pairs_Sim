@@ -116,7 +116,7 @@ def build_vocab(sentences, wordVec):
 def build_word_embed_matrix(word2ind, word_embed_dim=300, pretrained_wordVec=None):
     m = len(word2ind)+1
     if not pretrained_wordVec:
-        return numpy.random.rand(m, word_embed_dim)
+        return np.random.rand(m, word_embed_dim)
     else:
         wv = get_wordVec(word2ind, pretrained_wordVec)
         avg_wv = np.mean([value for key, value in wv.items()], axis=0)

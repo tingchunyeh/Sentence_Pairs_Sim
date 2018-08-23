@@ -38,44 +38,45 @@ class GRUEncoder(nn.Module):
         sent, sent_len = sent_tuple
         bsize = sent.size(1)
         
+        # init hidden state size 
         if bsize != self.init_lstm.size(1):
-            if self.use_cuda:
-                self.init_lstm = Variable(torch.FloatTensor(self.num_layer*2, bsize, self.enc_lstm_dim).zero_()).cuda()
-            else:
-                self.init_lstm = Variable(torch.FloatTensor(self.num_layer*2, bsize, self.enc_lstm_dim).zero_())
+            self.init_lstm = Variable(torch.FloatTensor(self.num_layer*2, bsize, self.enc_lstm_dim).zero_())
+            if self.use_cuda: self.init_lstm = self.init_lstm.cuda() 
+
         # Sort by length (keep idx)
         sent_len, idx_sort = np.sort(sent_len)[::-1], np.argsort(-sent_len)
-        if self.use_cuda:
-            sent = sent.index_select(1, Variable(torch.cuda.LongTensor(idx_sort)))
-        else:
-            sent = sent.index_select(1, Variable(torch.LongTensor(idx_sort)))
+        idx_sort = Variable(torch.LongTensor(idx_sort))
+        idx_unsort = Variable(torch.LongTensor(np.argsort(idx_sort)))  
+        if self.use_cuda: 
+            idx_sort = idx_sort.cuda()
+            idx_unsort = idx_unsort.cuda()
+        sent = sent.index_select(1, idx_sort)
         
         # Handling padding in Recurrent Networks
         sent_packed = pack_padded_sequence(sent, sent_len)
         sent_output, hidden = self.enc_lstm(sent_packed, self.init_lstm)
         
+        
         if not self.final_hidden_attention:
             #### use last hidden state ####
-            emb = torch.cat((hidden[0], hidden[1]), 1) # batch x 2*nhid
+            encode = torch.cat((hidden[0], hidden[1]), 1) # batch x 2*nhid
+            encode = encode.index_select(0, idx_unsort)
+            return (encode, None)
         else:
             ##### use attention #####
             padded_out_gru, lengths = pad_packed_sequence(sent_output, padding_value=int(0), batch_first=True)
-            unnormalize_weight = torch.tanh(torch.squeeze(self.attention(padded_out_gru), 2)) # seq_len x batch_size
-            unnormalize_weight = torch.softmax(unnormalize_weight, dim=1)
-            unnormalize_weight = pack_padded_sequence(unnormalize_weight, lengths, batch_first=True)
-            unnormalize_weight, lengths = pad_packed_sequence(unnormalize_weight, padding_value=0.0, batch_first=True)
-            normalize_weight = torch.nn.functional.normalize(unnormalize_weight, p=1, dim=1)
-            normalize_weight = normalize_weight.view(normalize_weight.size(0), 1, -1)
-            emb = torch.squeeze(normalize_weight.bmm(padded_out_gru), 1)
-
-        idx_unsort = np.argsort(idx_sort)
-        if self.use_cuda:
-            emb = emb.index_select(0, Variable(torch.cuda.LongTensor(idx_unsort)))
-        else:
-            emb = emb.index_select(0, Variable(torch.LongTensor(idx_unsort)))
+            weight = torch.tanh(torch.squeeze(self.attention(padded_out_gru), 2)) # seq_len x batch_size
+            weight = torch.softmax(weight, dim=1)
+            weight = pack_padded_sequence(weight, lengths, batch_first=True)
+            weight, lengths = pad_packed_sequence(weight, padding_value=0.0, batch_first=True)
+            weight = torch.nn.functional.normalize(weight, p=1, dim=1)  # normalizd
+            weight = weight.view(weight.size(0), 1, -1)  
+            encode = torch.squeeze(weight.bmm(padded_out_gru), 1)
             
-        return emb
-    
+            encode = encode.index_select(0, idx_unsort)
+            weight = weight.index_select(0, idx_unsort)
+            return (encode, weight)
+
 
 
 class NLINet(nn.Module):
@@ -114,8 +115,8 @@ class NLINet(nn.Module):
         embed1 = self.embed_dropout(self.embed(s1[0])).transpose_(0, 1)
         embed2 = self.embed_dropout(self.embed(s2[0])).transpose_(0, 1)
 
-        u = self.encoder((embed1, s1[1]))
-        v = self.encoder((embed2, s2[1]))
+        u, _ = self.encoder((embed1, s1[1]))
+        v, _ = self.encoder((embed2, s2[1]))
         features = torch.cat((u, v, torch.abs(u-v), u*v), 1)
         output = self.classifier(features)
         return output
@@ -123,5 +124,5 @@ class NLINet(nn.Module):
     
     def encode(self, s1):
         embed1 = self.embed_dropout(self.embed(s1[0])).transpose_(0, 1)
-        encode = self.encoder((embed1, s1[1]))
-        return encode
+        encode, weight = self.encoder((embed1, s1[1]))
+        return encode, weight

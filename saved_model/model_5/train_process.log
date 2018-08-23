@@ -1,0 +1,48 @@
+2018-08-22 16:01:00,190, INFO, results: epoch 0;  loss: 0.751;  mean accuracy train: 80.096
+2018-08-22 16:01:53,162, INFO, results: epoch 0;  mean accuracy dev: 84.336
+2018-08-22 16:28:16,440, INFO, results: epoch 1;  loss: 0.683;  mean accuracy train: 87.858
+2018-08-22 16:29:09,592, INFO, results: epoch 1;  mean accuracy dev: 85.941
+2018-08-22 16:55:28,786, INFO, results: epoch 2;  loss: 0.673;  mean accuracy train: 88.991
+2018-08-22 16:56:22,418, INFO, results: epoch 2;  mean accuracy dev: 86.78
+2018-08-22 17:22:45,191, INFO, results: epoch 3;  loss: 0.672;  mean accuracy train: 89.161
+2018-08-22 17:23:38,613, INFO, results: epoch 3;  mean accuracy dev: 86.263
+2018-08-22 17:52:10,048, INFO, results: epoch 0;  loss: 0.701;  mean accuracy train: 84.717
+2018-08-22 17:53:10,896, INFO, results: epoch 0;  mean accuracy dev: 87.952
+2018-08-22 18:19:12,615, INFO, results: epoch 1;  loss: 0.645;  mean accuracy train: 90.52
+2018-08-22 18:20:12,454, INFO, results: epoch 1;  mean accuracy dev: 87.926
+2018-08-22 18:46:27,078, INFO, results: epoch 2;  loss: 0.63;  mean accuracy train: 92.041
+2018-08-22 18:47:27,196, INFO, results: epoch 2;  mean accuracy dev: 89.207
+2018-08-22 19:13:34,804, INFO, results: epoch 3;  loss: 0.623;  mean accuracy train: 92.847
+2018-08-22 19:14:30,639, INFO, results: epoch 3;  mean accuracy dev: 89.307
+2018-08-22 19:40:23,149, INFO, results: epoch 4;  loss: 0.612;  mean accuracy train: 93.987
+2018-08-22 19:41:16,164, INFO, results: epoch 4;  mean accuracy dev: 89.694
+2018-08-22 20:06:33,052, INFO, results: epoch 5;  loss: 0.609;  mean accuracy train: 94.317
+2018-08-22 20:07:28,463, INFO, results: epoch 5;  mean accuracy dev: 89.824
+2018-08-22 20:32:23,388, INFO, results: epoch 6;  loss: 0.604;  mean accuracy train: 94.886
+2018-08-22 20:33:17,340, INFO, results: epoch 6;  mean accuracy dev: 89.916
+2018-08-22 20:58:12,104, INFO, results: epoch 7;  loss: 0.601;  mean accuracy train: 95.246
+2018-08-22 20:59:03,366, INFO, results: epoch 7;  mean accuracy dev: 90.077
+2018-08-22 21:23:52,158, INFO, results: epoch 8;  loss: 0.599;  mean accuracy train: 95.417
+2018-08-22 21:24:41,370, INFO, results: epoch 8;  mean accuracy dev: 90.208
+2018-08-22 21:49:29,840, INFO, results: epoch 9;  loss: 0.598;  mean accuracy train: 95.51
+2018-08-22 21:50:19,406, INFO, results: epoch 9;  mean accuracy dev: 90.28
+2018-08-22 22:15:09,084, INFO, results: epoch 10;  loss: 0.598;  mean accuracy train: 95.571
+2018-08-22 22:15:59,861, INFO, results: epoch 10;  mean accuracy dev: 90.268
+2018-08-22 22:40:50,054, INFO, results: epoch 11;  loss: 0.597;  mean accuracy train: 95.584
+2018-08-22 22:41:39,238, INFO, results: epoch 11;  mean accuracy dev: 90.258
+2018-08-22 23:06:38,033, INFO, results: epoch 12;  loss: 0.597;  mean accuracy train: 95.602
+2018-08-22 23:07:35,393, INFO, results: epoch 12;  mean accuracy dev: 90.216
+2018-08-22 23:32:29,095, INFO, results: epoch 13;  loss: 0.597;  mean accuracy train: 95.602
+2018-08-22 23:33:20,891, INFO, results: epoch 13;  mean accuracy dev: 90.231
+2018-08-22 23:59:18,236, INFO, results: epoch 14;  loss: 0.597;  mean accuracy train: 95.596
+2018-08-23 00:00:09,953, INFO, results: epoch 14;  mean accuracy dev: 90.235
+2018-08-23 00:25:45,688, INFO, results: epoch 15;  loss: 0.597;  mean accuracy train: 95.592
+2018-08-23 00:26:36,936, INFO, results: epoch 15;  mean accuracy dev: 90.239
+2018-08-23 00:52:09,731, INFO, results: epoch 16;  loss: 0.597;  mean accuracy train: 95.599
+2018-08-23 00:53:00,561, INFO, results: epoch 16;  mean accuracy dev: 90.238
+2018-08-23 01:18:54,905, INFO, results: epoch 17;  loss: 0.597;  mean accuracy train: 95.622
+2018-08-23 01:19:45,805, INFO, results: epoch 17;  mean accuracy dev: 90.239
+2018-08-23 01:45:23,340, INFO, results: epoch 18;  loss: 0.597;  mean accuracy train: 95.603
+2018-08-23 01:46:13,599, INFO, results: epoch 18;  mean accuracy dev: 90.242
+2018-08-23 02:12:04,513, INFO, results: epoch 19;  loss: 0.597;  mean accuracy train: 95.596
+2018-08-23 02:12:57,912, INFO, results: epoch 19;  mean accuracy dev: 90.244

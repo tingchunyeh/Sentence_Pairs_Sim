@@ -1,0 +1,20 @@
+2018-08-23 10:39:54,016, INFO, results: epoch 0;  loss: 0.679;  mean accuracy train: 86.984
+2018-08-23 10:40:45,507, INFO, results: epoch 0;  mean accuracy dev: 89.214
+2018-08-23 11:06:01,329, INFO, results: epoch 1;  loss: 0.618;  mean accuracy train: 93.188
+2018-08-23 11:06:53,440, INFO, results: epoch 1;  mean accuracy dev: 89.725
+2018-08-23 11:32:27,807, INFO, results: epoch 2;  loss: 0.601;  mean accuracy train: 94.927
+2018-08-23 11:33:18,898, INFO, results: epoch 2;  mean accuracy dev: 90.41
+2018-08-23 11:59:01,198, INFO, results: epoch 3;  loss: 0.592;  mean accuracy train: 95.932
+2018-08-23 11:59:59,821, INFO, results: epoch 3;  mean accuracy dev: 90.383
+2018-08-23 12:25:45,500, INFO, results: epoch 4;  loss: 0.582;  mean accuracy train: 96.876
+2018-08-23 12:26:50,621, INFO, results: epoch 4;  mean accuracy dev: 90.303
+2018-08-23 12:52:13,373, INFO, results: epoch 5;  loss: 0.578;  mean accuracy train: 97.276
+2018-08-23 12:53:03,494, INFO, results: epoch 5;  mean accuracy dev: 90.405
+2018-08-23 13:17:54,434, INFO, results: epoch 6;  loss: 0.575;  mean accuracy train: 97.65
+2018-08-23 13:18:46,491, INFO, results: epoch 6;  mean accuracy dev: 90.382
+2018-08-23 13:43:48,494, INFO, results: epoch 7;  loss: 0.573;  mean accuracy train: 97.873
+2018-08-23 13:44:39,089, INFO, results: epoch 7;  mean accuracy dev: 90.424
+2018-08-23 14:09:52,703, INFO, results: epoch 8;  loss: 0.571;  mean accuracy train: 97.983
+2018-08-23 14:10:46,026, INFO, results: epoch 8;  mean accuracy dev: 90.278
+2018-08-23 14:36:54,265, INFO, results: epoch 9;  loss: 0.571;  mean accuracy train: 98.028
+2018-08-23 14:37:44,425, INFO, results: epoch 9;  mean accuracy dev: 90.341

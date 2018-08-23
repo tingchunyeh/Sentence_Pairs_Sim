@@ -31,7 +31,7 @@ parser.add_argument("--dpout_embed", type=float, default=0., help="embed dropout
 parser.add_argument("--embed_freeze", action='store_true', help="freeze embedding layer 0:False, 1:True")
 parser.add_argument("--lr", type=float, default=0.001, help="learning rate for adam")
 parser.add_argument("--last_model", type=str, default="", help="train on last saved model")
-parser.add_argument("--saved_model_name", type=str, default="model_new", help="saved model name")
+parser.add_argument("--saved_model_name", type=str, default="model_try", help="saved model name")
 parser.add_argument("--w2v_model", type=str, default="w2v-model.txt", help="w2v file name")
 parser.add_argument("--weight_decay", type=float, default=0., help="L2 penalty")
 parser.add_argument("--lr_decay_th", type=float, default=0., help="threshold on loss improve for learning rate decay")
@@ -64,7 +64,7 @@ else:
     word2ind = pickle.load( open( os.path.join(params.data_path, "word2ind.pickle" ), "rb") )
     ind2word = pickle.load( open( os.path.join(params.data_path, "ind2word.pickle" ), "rb") )
     
-word_embed_matrix = build_word_embed_matrix(word2ind, pretrained_wordVec="w2v-model.txt")
+word_embed_matrix = build_word_embed_matrix(word2ind, pretrained_wordVec=params.w2v_model)
 
 
 '''
@@ -84,17 +84,17 @@ config_nli_model = {
     'encoder_type'   :  params.encoder_type,
     'use_cuda'       :  params.use_cuda,
     'dpout_embed'    :  params.dpout_embed,
-    'embed_freeze'   :  params.embed_freeze==1,
+    'embed_freeze'   :  params.embed_freeze,
     'embed_matrix'   :  word_embed_matrix,
     'weight_decay'   :  params.weight_decay,
-    "final_hidden_attention": params.final_hidden_attention==1,
+    "final_hidden_attention": params.final_hidden_attention,
 }
     
 
 nli_net = NLINet(config_nli_model)
 if params.last_model:
     print("load model {}".format(params.last_model))
-    nli_net.load_state_dict(torch.load(os.path.join("saved_model", params.last_model)))
+    nli_net.load_state_dict(torch.load(os.path.join("saved_model", params.last_model, params.last_model)))
 print(nli_net)
 
 # loss 
@@ -215,8 +215,8 @@ Train model
 saved_folder = os.path.join("saved_model", params.saved_model_name)        
 if not os.path.exists(saved_folder): os.makedirs(saved_folder)
     
-with open( os.path.join(saved_folder, "config.pickle" ), 'wb') as handle:
-    pickle.dump(params, handle, protocol=pickle.HIGHEST_PROTOCOL)  
+# with open( os.path.join(saved_folder, "config.pickle" ), 'wb') as handle:
+#     pickle.dump(params, handle, protocol=pickle.HIGHEST_PROTOCOL)  
 with open( os.path.join(saved_folder,'config.json'), 'w') as fp:
     json.dump( vars(params), fp)
     
@@ -236,13 +236,13 @@ eval_acc = 0
 prev_loss = float('inf')
 
 for i in range(params.n_epochs):
-    print('\nTRAINING : Epoch ' + str(i))
+    print('\nTRAINING : Epoch ' + str(i) + " --- "+ params.saved_model_name)
     train_loss, train_acc = trainepoch(i)
     train_loss_ls.append(train_loss)
     train_acc_ls.append(train_acc)
     
     print("-"*100)
-    print('\nTRAINING : Epoch ' + str(i))
+    print('\nTRAINING : Epoch ' + str(i) + " --- "+ params.saved_model_name)
     for pi in range(len(train_loss_ls)):
         train_result = 'results: epoch {0};  loss: {1};  mean accuracy train: {2}'.format(pi, train_loss_ls[pi], train_acc_ls[pi])
         print(train_result)
@@ -255,7 +255,7 @@ for i in range(params.n_epochs):
         
     if i%1==0:
         print("-"*100)
-        print('\nEVALIDATING: Epoch ' + str(i))
+        print('\nEVALIDATING: Epoch ' + str(i) + " --- "+ params.saved_model_name)
         eval_acc = evaluate(i, eval_type='dev')
         eval_acc_ls.append(eval_acc)
         
