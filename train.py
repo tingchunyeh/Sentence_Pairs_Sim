@@ -14,13 +14,13 @@ parser.add_argument("--data_path", type=str, default='data', help="path to data"
 
 # model
 parser.add_argument("--encoder_type", type=str, default='GRUEncoder', help="see list of encoders")
-parser.add_argument("--enc_lstm_dim", type=int, default=256, help="encoder nhid dimension")
+parser.add_argument("--enc_hidden_dim", type=int, default=256, help="encoder nhid dimension")
 parser.add_argument("--num_layer", type=int, default=1, help="encoder num layers")
 parser.add_argument("--fc_dim", type=int, default=256, help="nhid of fc layers")
 parser.add_argument("--n_classes", type=int, default=3, help="entailment/neutral/contradiction")
 parser.add_argument("--pool_type", type=str, default='max', help="max or mean")
-parser.add_argument("--use_cuda", action='store_true', help="True or False")
-parser.add_argument("--final_hidden_attention", action='store_true', help="use attentsion for final hidden state.")
+parser.add_argument("--use_cuda", type=int, default=1, help="True or False")
+parser.add_argument("--use_attention", type=int, default=0, help="use attentsion for final hidden state.")
 
 # train
 parser.add_argument("--n_epochs", type=int, default=10)
@@ -29,7 +29,7 @@ parser.add_argument("--dpout_model", type=float, default=0., help="encoder dropo
 parser.add_argument("--dpout_fc", type=float, default=0.2, help="classifier dropout")
 parser.add_argument("--dpout_embed", type=float, default=0., help="embed dropout")
 parser.add_argument("--embed_freeze", action='store_true', help="freeze embedding layer 0:False, 1:True")
-parser.add_argument("--lr", type=float, default=0.001, help="learning rate for adam")
+parser.add_argument("--lr", type=float, default=0.0001, help="learning rate for adam")
 parser.add_argument("--last_model", type=str, default="", help="train on last saved model")
 parser.add_argument("--saved_model_name", type=str, default="model_try", help="saved model name")
 parser.add_argument("--w2v_model", type=str, default="w2v-model.txt", help="w2v file name")
@@ -73,7 +73,7 @@ MODEL
 config_nli_model = {
     'n_words'        :  word_embed_matrix.shape[0],
     'word_emb_dim'   :  word_embed_matrix.shape[1],
-    'enc_lstm_dim'   :  params.enc_lstm_dim,
+    'enc_hidden_dim' :  params.enc_hidden_dim,
     'num_layer'      :  params.num_layer,
     'dpout_model'    :  params.dpout_model,
     'dpout_fc'       :  params.dpout_fc,
@@ -82,12 +82,12 @@ config_nli_model = {
     'n_classes'      :  params.n_classes,
     'pool_type'      :  params.pool_type,
     'encoder_type'   :  params.encoder_type,
-    'use_cuda'       :  params.use_cuda,
+    'use_cuda'       :  params.use_cuda==1,
     'dpout_embed'    :  params.dpout_embed,
     'embed_freeze'   :  params.embed_freeze,
     'embed_matrix'   :  word_embed_matrix,
     'weight_decay'   :  params.weight_decay,
-    "final_hidden_attention": params.final_hidden_attention,
+    "use_attention"  : params.use_attention,
 }
     
 

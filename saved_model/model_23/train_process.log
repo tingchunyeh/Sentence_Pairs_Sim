@@ -1,0 +1,6 @@
+2018-08-27 15:19:01,561, INFO, results: epoch 0;  loss: 0.669;  mean accuracy train: 87.937
+2018-08-27 15:19:55,558, INFO, results: epoch 0;  mean accuracy dev: 90.048
+2018-08-27 15:42:51,683, INFO, results: epoch 1;  loss: 0.596;  mean accuracy train: 95.483
+2018-08-27 15:43:40,533, INFO, results: epoch 1;  mean accuracy dev: 91.515
+2018-08-27 16:07:55,928, INFO, results: epoch 2;  loss: 0.579;  mean accuracy train: 97.249
+2018-08-27 16:08:44,731, INFO, results: epoch 2;  mean accuracy dev: 91.548

@@ -10,21 +10,6 @@ from gensim.models import Word2Vec, KeyedVectors
 import os
 import collections
 
-# def get_batch(batch, wv, default_wv, dropout=0.0):
-#     batch = [ sentence.split() for sentence in batch]
-#     lengths = np.array([len(x) for x in batch])
-#     max_len = np.max(lengths)
-#     embed = np.zeros((max_len, len(batch), 300))
-    
-#     for i in range(len(batch)):
-#         for j in range(len(batch[i])):
-#             if np.random.rand()<dropout: continue
-#             if batch[i][j] not in wv:
-#                 embed[j, i, :] = default_wv
-#             else:
-#                 embed[j, i, :] = wv[batch[i][j]]
-#     return torch.from_numpy(embed).float(), lengths
-
 def get_inds_batch(batch, word2ind):
     lengths = np.array([len(x.split(" ")) for x in batch])
     max_len = np.max(lengths)
@@ -39,7 +24,6 @@ def get_inds_batch(batch, word2ind):
                 sentence.append(word2ind['<unk>'])  
         sentence_tensor[i][:lengths[i]] = torch.LongTensor(sentence)
     return sentence_tensor, lengths
-
 
 def create_pair_data(kb_answer):
     pairs = []
@@ -112,7 +96,6 @@ def build_vocab(sentences, wordVec):
     default_wv = np.mean([value for key, value in wv.items()], axis=0)
     return wv, default_wv
 
-
 def build_word_embed_matrix(word2ind, word_embed_dim=300, pretrained_wordVec=None):
     m = len(word2ind)+1
     if not pretrained_wordVec:
@@ -155,11 +138,6 @@ def get_word2ind_ind2word(sentences, min_n=5):
                 ind2word.append(word)
                 
     return word2ind, ind2word
-            
-    
-
-
-
 
 def get_question_pairs(data_path):
     s1 = {}
