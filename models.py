@@ -18,7 +18,7 @@ class CNNEncoder(nn.Module):
         window_sizes = config['window_sizes'] if 'window_sizes' in config else [2,3,4]
         
         self.convs = nn.ModuleList([
-            nn.Conv2d(1, self.enc_hidden_dim, [window_size, self.word_emb_dim], padding=(window_size - 1, 0))
+            nn.Conv2d(1, self.enc_hidden_dim, [window_size, self.word_emb_dim], padding=(window_size-1, 0))
             for window_size in window_sizes
         ])
 
@@ -26,7 +26,7 @@ class CNNEncoder(nn.Module):
     def forward(self, sent_tuple):
         sent, sent_len = sent_tuple
 
-        # Apply a convolution + max pool layer for each window size
+        # convolution + max pool layer for each window size
         x = sent.contiguous().transpose_(0,1)
         x = torch.unsqueeze(x, 1)       # [B, C, T, E] Add a channel dim.
         xs = []
@@ -66,8 +66,8 @@ class GRUEncoder(nn.Module):
             self.init_lstm = Variable(torch.FloatTensor(self.num_layer*2, self.bsize, self.enc_hidden_dim).zero_()).cuda()
         else:
             self.init_lstm = Variable(torch.FloatTensor(self.num_layer*2, self.bsize, self.enc_hidden_dim).zero_())
-
-
+        
+        
     def forward(self, sent_tuple):
         # sent_len: [max_len, ..., min_len] (batch)
         # sent: Variable(seqlen x batch x worddim)

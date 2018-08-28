@@ -10,7 +10,7 @@ import json
 PARAMETERS
 '''
 parser = argparse.ArgumentParser(description='NLI training')
-parser.add_argument("--data_path", type=str, default='data', help="path to data")
+parser.add_argument("--data_path", type=str, default='data', help="path to data")==
 
 # model
 parser.add_argument("--encoder_type", type=str, default='GRUEncoder', help="see list of encoders")
