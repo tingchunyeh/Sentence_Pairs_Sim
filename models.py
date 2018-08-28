@@ -27,18 +27,18 @@ class CNNEncoder(nn.Module):
         sent, sent_len = sent_tuple
 
         # convolution + max pool layer for each window size
-        x = sent.contiguous().transpose_(0,1)
-        x = torch.unsqueeze(x, 1)       # [B, C, T, E] Add a channel dim.
-        xs = []
+        sent = sent.contiguous().transpose_(0,1)
+        sent = torch.unsqueeze(sent, 1)       # [B, C, T, E] Add a channel dim.
+        encodes = []
         for conv in self.convs:
-            x2 = F.relu(conv(x))        # [B, F, T, 1]
-            x2 = torch.squeeze(x2, -1)  # [B, F, T]
-            x2 = F.max_pool1d(x2, x2.size(2))  # [B, F, 1]
-            xs.append(x2)
-        x = torch.cat(xs, 2)            # [B, F, window]
+            encode = F.relu(conv(sent))        # [B, F, T, 1]
+            encode = torch.squeeze(encode, -1)  # [B, F, T]
+            encode = F.max_pool1d(encode, encode.size(2))  # [B, F, 1]
+            encodes.append(encode)
+        encode = torch.cat(encodes, 2)            # [B, F, window]
 
-        x = x.view(x.size(0), -1)       # [B, F * window]
-        return x
+        encode = encode.view(encode.size(0), -1)       # [B, F * window]
+        return encode
         
 
 class GRUEncoder(nn.Module):
@@ -57,10 +57,6 @@ class GRUEncoder(nn.Module):
         
         if self.use_attention==1: 
             self.attention = nn.Linear(2*self.enc_hidden_dim, 1)
-        elif self.use_attention==2:
-            pass
-        else:
-            pass
 
         if self.use_cuda:
             self.init_lstm = Variable(torch.FloatTensor(self.num_layer*2, self.bsize, self.enc_hidden_dim).zero_()).cuda()
