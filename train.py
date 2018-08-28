@@ -10,7 +10,7 @@ import json
 PARAMETERS
 '''
 parser = argparse.ArgumentParser(description='NLI training')
-parser.add_argument("--data_path", type=str, default='data', help="path to data")==
+parser.add_argument("--data_path", type=str, default='data', help="path to data")
 
 # model
 parser.add_argument("--encoder_type", type=str, default='GRUEncoder', help="see list of encoders")
@@ -29,7 +29,7 @@ parser.add_argument("--dpout_model", type=float, default=0., help="encoder dropo
 parser.add_argument("--dpout_fc", type=float, default=0.2, help="classifier dropout")
 parser.add_argument("--dpout_embed", type=float, default=0., help="embed dropout")
 parser.add_argument("--embed_freeze", action='store_true', help="freeze embedding layer 0:False, 1:True")
-parser.add_argument("--lr", type=float, default=0.0001, help="learning rate for adam")
+parser.add_argument("--lr", type=float, default=0.0005, help="learning rate for adam")
 parser.add_argument("--last_model", type=str, default="", help="train on last saved model")
 parser.add_argument("--saved_model_name", type=str, default="model_try", help="saved model name")
 parser.add_argument("--w2v_model", type=str, default="w2v-model.txt", help="w2v file name")

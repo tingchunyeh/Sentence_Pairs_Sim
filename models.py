@@ -66,7 +66,7 @@ class GRUEncoder(nn.Module):
             self.init_lstm = Variable(torch.FloatTensor(self.num_layer*2, self.bsize, self.enc_hidden_dim).zero_()).cuda()
         else:
             self.init_lstm = Variable(torch.FloatTensor(self.num_layer*2, self.bsize, self.enc_hidden_dim).zero_())
-        
+            
         
     def forward(self, sent_tuple):
         # sent_len: [max_len, ..., min_len] (batch)
